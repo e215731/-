@@ -1,13 +1,25 @@
+'''
+実験1：気温予測
+気温データ"new_naha_kion"から,2024年の気温を予測し
+'予測データ/predicted_2024_temperatures.csv'に保存．
+'''
+
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 気温データを読み込む
-temper_data = pd.read_csv('new_naha_kion.csv', encoding="utf-8")
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
-# 過去6日分を特徴量、その翌日の気温を目的変数とする訓練データを作成する関数
+
+# 気温データを読み込む
+temper_data = pd.read_csv('加工後データ/new_naha_kion.csv', encoding="utf-8")
+
+# intervalの準備
 def make_data(data, interval):
     x = []
     y = []
@@ -36,15 +48,14 @@ train_x_scaled = scaler.fit_transform(train_x)
 lr = LinearRegression()
 lr.fit(train_x_scaled, train_y)
 
-# 2023年のデータを使用して2024年の気温を予測
+# 2024年の気温を予測
 test_year_2023 = (temper_data["年"] == 2023)
 test_x_2023, _ = make_data(temper_data[test_year_2023], interval)
 test_x_2023_scaled = scaler.transform(test_x_2023)
 pre_y_2024 = lr.predict(test_x_2023_scaled)
 
 # 予測した2024年の気温データを保存
-# ここで月と日を生成
-test_data_2023 = temper_data[test_year_2023].iloc[interval:]  # 最初のinterval日を除く
+test_data_2023 = temper_data[test_year_2023].iloc[interval:]  #
 months_2024 = test_data_2023['月'].values
 days_2024 = test_data_2023['日'].values
 
@@ -66,11 +77,10 @@ plt.legend()
 plt.xlabel('日数')
 plt.ylabel('気温 (℃)')
 plt.title('2023年の実際の気温と2024年の予測気温の比較')
-plt.savefig('tenki-kion-2023_vs_2024.png')
 plt.show()
 
 # 予測した2024年の気温データをCSVファイルとして保存
-predicted_2024_df.to_csv('predicted_2024_temperatures.csv', index=False, encoding='utf-8')
+predicted_2024_df.to_csv('予測データ/predicted_2024_temperatures.csv', index=False, encoding='utf-8')
 
 
 from sklearn.metrics import mean_absolute_error

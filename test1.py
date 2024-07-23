@@ -44,5 +44,5 @@ plt.grid(True)
 
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('actual_vs_predicted_2024_10730.png')
+#plt.savefig('actual_vs_predicted_2024_10730.png')
 plt.show()

@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # 予測した気温データと湿度データを読み込む
-temperature_df = pd.read_csv('lasso_気温予測.csv', encoding="utf-8")
-humidity_df = pd.read_csv('lasso_湿度予測.csv', encoding="utf-8")
+temperature_df = pd.read_csv('予測データ/lasso_気温予測.csv', encoding="utf-8")
+humidity_df = pd.read_csv('予測データ/lasso_湿度予測.csv', encoding="utf-8")
 
 # 不快指数を計算する関数
 def calculate_discomfort_index(temp, hum):

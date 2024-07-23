@@ -1,8 +1,10 @@
-# 
-# ダウンロードした「data.csv」を学習に使えるデータへ加工し、「koshigaya_kion.csv」という別のファイル名で保存
-# 
-in_file = "naha_kion.csv"
-out_file = "new_naha_kion.csv"
+'''
+「気温」データを加工し,
+"加工後データ/new_naha_kion.csv"に保存
+'''
+
+in_file = "データセット/naha_kion.csv"
+out_file = "加工後データ/new_naha_kion.csv"
 
 # CSVファイルを読み込む
 with open(in_file, "rt", encoding="Shift_JIS") as fr:

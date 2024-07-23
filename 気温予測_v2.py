@@ -1,34 +1,38 @@
+'''
+実験2
+新しい特徴量を用いた気温の予測, 
+"予測データ/vvs_気温予測.csv"に保存
+'''
+
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 import numpy as np
 
 # 気温データを読み込む
-temper_data = pd.read_csv('new_naha_kion.csv', encoding="utf-8")
+temper_data = pd.read_csv('加工後データ/new_naha_kion.csv', encoding="utf-8")
 
 # 新しい特徴量を読み込む
-humidity_data = pd.read_csv('new_naha_shitsudo.csv', encoding="utf-8")
-weather_data = pd.read_csv('new_naha_tenki.csv', encoding="utf-8")
+humidity_data = pd.read_csv('加工後データ/new_naha_shitsudo.csv', encoding="utf-8")
+weather_data = pd.read_csv('加工後データ/new_naha_tenki.csv', encoding="utf-8")
 
-# 新しい特徴量を統合する
+
 def integrate_features(temper_data, humidity_data, weather_data):
-    # 必要な列を抽出
     humidity = humidity_data['湿度']
     max_temp = weather_data['最高気温(℃)']
     precipitation = weather_data['降水量の合計(mm)']
     sunshine_hours = weather_data['日照時間(時間)']
 
-    # データを結合する
     integrated_data = pd.concat([temper_data, humidity, max_temp, precipitation, sunshine_hours], axis=1)
     return integrated_data
 
-# 新しい特徴量を統合する
+
 integrated_data = integrate_features(temper_data, humidity_data, weather_data)
 
 # 欠損値を平均値で補完
 integrated_data.fillna(integrated_data.mean(), inplace=True)
 
-# 過去6日分の気温データと新しい特徴量を特徴量、その翌日の気温を目的変数とする訓練データを作成する関数
+# intervalの準備
 def make_data(data, interval):
     x = []
     y = []
@@ -57,7 +61,6 @@ train_x_scaled = scaler.fit_transform(train_x)
 lr = LinearRegression()
 lr.fit(train_x_scaled, train_y)
 
-# 2023年のデータを使用して2024年の気温を予測
 test_year_2023 = (integrated_data["年"] == 2023)
 
 # テストデータの作成
@@ -81,10 +84,11 @@ predicted_2024_df = pd.DataFrame({
     '予測気温': pre_y_2024
 })
 
-# 予測した2024年の気温データをCSVファイルとして保存
-predicted_2024_df.to_csv('vvs_気温予測.csv', index=False, encoding='utf-8')
+# 予測した2024年の気温データを保存
+predicted_2024_df.to_csv('予測データ/vvs_気温予測.csv', index=False, encoding='utf-8')
 
 
+# 各特徴量の重みを表示
 feature_names = ['湿度', '最高気温(℃)', '降水量の合計(mm)', '日照時間(時間)']
 print("各特徴量の重み:")
 for i, feature in enumerate(feature_names):

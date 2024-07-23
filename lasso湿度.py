@@ -1,25 +1,36 @@
+'''
+実験3
+Lasso回帰を用いた湿度の予測, 
+"予測データ/lasso_湿度予測.csv"に保存
+'''
+
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Lasso
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
+
+
 # 気温データを読み込む
-temper_data = pd.read_csv('new_naha_kion.csv', encoding="utf-8")
+temper_data = pd.read_csv('加工後データ/new_naha_kion.csv', encoding="utf-8")
 
 # 新しい特徴量を読み込む
-humidity_data = pd.read_csv('new_naha_shitsudo.csv', encoding="utf-8")
-weather_data = pd.read_csv('new_naha_tenki.csv', encoding="utf-8")
-weather_summary_data = pd.read_csv('new_naha_weather.csv', encoding="utf-8")
+humidity_data = pd.read_csv('加工後データ/new_naha_shitsudo.csv', encoding="utf-8")
+weather_data = pd.read_csv('加工後データ/new_naha_tenki.csv', encoding="utf-8")
+weather_summary_data = pd.read_csv('加工後データ/new_naha_weather.csv', encoding="utf-8")
 
-# 天気概要の数値変換マッピングを定義する
+# 天気概要の数値変換
 weather_summary_mapping = {
     "快晴": 0, "晴": 1, "曇": 2, "薄曇": 3, "大風": 4, "霧": 5, "霧雨": 6, "雨": 7, "大雨": 8,
     "暴風雨": 9, "みぞれ": 10, "雪": 11, "大雪": 12, "暴風雪": 13, "地ふぶき": 14, "ふぶき": 15,
     "ひょう": 16, "あられ": 17, "雷": 18, "×": 19
 }
 
-# 天気変化の数値変換マッピングを定義する
+# 天気変化の数値変換
 weather_change_mapping = {
     "": 0, "一時": 1, "時々": 2, "後": 3, "後一時": 4, "後時々": 5
 }
@@ -54,7 +65,7 @@ def make_data(data, interval):
     y = []
     for i in range(len(data)):
         if i < interval: continue
-        y.append(data.iloc[i]['気温'])
+        y.append(data.iloc[i]['湿度'])
         xa = []
         for p in range(interval):
             d = i + p - interval
@@ -73,20 +84,20 @@ train_x, train_y = make_data(integrated_data[train_year], interval)
 scaler = StandardScaler()
 train_x_scaled = scaler.fit_transform(train_x)
 
-# Lasso回帰モデルを用いたハイパーパラメータの調整例
+# alpha値の調整例
 lasso = Lasso()
-parameters = {'alpha': [0.05, 0.1, 0.5, 1, 5]}  # alphaは正則化項の強さを示すパラメータ
+parameters = {'alpha': [0.05, 0.1, 0.5, 1, 5]}   
 
-# グリッドサーチによる最適なパラメータの探索
+# グリッドサーチによる最適なalphaの探索
 lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_absolute_error', cv=5)
 lasso_regressor.fit(train_x_scaled, train_y)
 
-# 最適なパラメータでモデルを訓練
+# 最適なalphaでモデルを訓練
 best_alpha = lasso_regressor.best_params_['alpha']
 lasso = Lasso(alpha=best_alpha)
 lasso.fit(train_x_scaled, train_y)
 
-# 2023年のデータを使用して2024年の気温を予測
+#2024年の気温を予測
 test_year_2023 = (integrated_data["年"] == 2023)
 
 # テストデータの作成
@@ -99,7 +110,7 @@ test_x_2023_scaled = scaler.transform(test_x_2023)
 pre_y_2024_lasso = lasso.predict(test_x_2023_scaled)
 
 # 予測した2024年の気温データを保存
-test_data_2023 = integrated_data[test_year_2023].iloc[interval:]  # 最初のinterval日を除く
+test_data_2023 = integrated_data[test_year_2023].iloc[interval:]  
 months_2024 = test_data_2023['月'].values
 days_2024 = test_data_2023['日'].values
 
@@ -107,25 +118,14 @@ predicted_2024_df_lasso = pd.DataFrame({
     '年': 2024,
     '月': months_2024,
     '日': days_2024,
-    '予測気温': pre_y_2024_lasso
+    '予測湿度': pre_y_2024_lasso
 })
 
 # 予測した2024年の気温データをCSVファイルとして保存
-predicted_2024_df_lasso.to_csv('lasso_気温予測.csv', index=False, encoding='utf-8')
-print("Lassoモデルによる予測を保存しました。")
+predicted_2024_df_lasso.to_csv('予測データ/lasso_湿度予測.csv', index=False, encoding='utf-8')
 
 
 print(f"最適なalphaの値: {best_alpha}")
-
-
-"""
-# 各特徴量の重みを出力
-feature_names = ['気温', '湿度', '最高気温(℃)', '降水量の合計(mm)', '日照時間(時間)', '天気概況', '天気変化']
-for i in range(interval):
-    print(f"Interval {i+1}:")
-    for j, feature in enumerate(feature_names):
-        print(f"  {feature}: {lasso.coef_[i*len(feature_names) + j]}")
-"""
 
 # 各特徴量の重みを出力
 feature_names = ['気温', '湿度', '最高気温(℃)', '降水量の合計(mm)', '日照時間(時間)', '天気概況', '天気変化']

@@ -16,10 +16,10 @@ os.chdir(script_dir)
 print("Current Working Directory after change: ", os.getcwd())
 
 # ファイル名
-predicted_temperature_file = 'lasso_気温予測.csv'
-actual_temperature_file = 'new_2024_kion_11630.csv'
-predicted_humidity_file = 'lasso_湿度予測.csv'
-actual_humidity_file = 'new_2024_shitsudo_11630.csv'
+predicted_temperature_file = '予測データ/lasso_気温予測.csv'
+actual_temperature_file = '加工後データ/new_2024_kion_11630.csv'
+predicted_humidity_file = '予測データ/lasso_湿度予測.csv'
+actual_humidity_file = '加工後データ/new_2024_shitsudo_11630.csv'
 
 # ファイルの存在確認
 for file in [predicted_temperature_file, actual_temperature_file, predicted_humidity_file, actual_humidity_file]:
@@ -104,5 +104,5 @@ plt.legend()
 plt.grid(True)
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('actual_vs_predicted_discomfort_index_2024_10730.png')
+plt.savefig('images/実際の不快指数との比較_lasso.png')
 plt.show()

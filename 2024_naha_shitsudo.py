@@ -1,11 +1,23 @@
+'''
+実験1：湿度予測
+気温データ"new_naha_shitsudo"から,2024年の気温を予測し
+'予測データ/predicted_2024_humidity.csv'に保存．
+'''
+
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
+
+
 # 気温データを読み込む
-temper_data = pd.read_csv('new_naha_shitsudo.csv', encoding="utf-8")
+temper_data = pd.read_csv('加工後データ/new_naha_shitsudo.csv', encoding="utf-8")
 
 # 過去6日分を特徴量、その翌日の気温を目的変数とする訓練データを作成する関数
 def make_data(data, interval):
@@ -66,8 +78,7 @@ plt.legend()
 plt.xlabel('日数')
 plt.ylabel('湿度 (%)')
 plt.title('2023年の実際の湿度と2024年の予測湿度の比較')
-plt.savefig('tenki-shitsudo-2023_vs_2024.png')
 plt.show()
 
 # 予測した2024年の気温データをCSVファイルとして保存
-predicted_2024_df.to_csv('predicted_2024_humidity.csv', index=False, encoding='utf-8')
+predicted_2024_df.to_csv('予測データ/predicted_2024_humidity.csv', index=False, encoding='utf-8')
